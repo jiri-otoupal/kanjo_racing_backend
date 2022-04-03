@@ -1,0 +1,4 @@
+/.idea/
+/db/db_config_dev.php
+/dev/db_config_prod.php
+/db/db_config_prod.php
