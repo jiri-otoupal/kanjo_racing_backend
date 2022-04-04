@@ -1,14 +1,16 @@
 <?php
 
-if ($_SERVER["DEV"] == "true")
-    require "db_config_dev.php";
+$debug = true;
+
+if ($debug)
+    require (dirname(__FILE__) . '/..') . "/db_config_dev.php";
 else
-    require "db_config_prod.php";
+    require (dirname(__FILE__) . '/..') . "/db_config_prod.php";
 
 abstract class DB
 {
     // Protected so child's can access these attributes
-    protected $dbPath = 'otoj00';
+    protected $dbPath = DB_DATABASE;
     protected $dbExtension = '.db';
     protected $delimiter = ',';
     /**
@@ -16,9 +18,9 @@ abstract class DB
      */
     protected $connection;
 
-    public function __construct($dbPath)
+    public function __construct()
     {
-        $this->dbPath = $dbPath;
+        $this->dbPath = DB_DATABASE;
         $this->connection = new mysqli(
             DB_SERVER_URL,
             DB_USERNAME,
@@ -35,6 +37,11 @@ abstract class DB
         return "database config: dbPath: $this->dbPath, dbExtenstion: $this->dbExtension, delimiter: $this->delimiter";
     }
 
+    protected function escape($string)
+    {
+        return mysqli_real_escape_string($this->connection, $string);
+    }
+
     protected function query($query_string)
     {
         $result = $this->connection->query($query_string);
@@ -43,6 +50,15 @@ abstract class DB
             return $result->fetch_assoc();
 
         return [];
+    }
+
+    protected function non_return_query($query_string)
+    {
+        try {
+            return $this->connection->query($query_string);
+        } catch (mysqli_sql_exception $ex) {
+            return false;
+        }
     }
 
     public function configInfo()
