@@ -46,9 +46,10 @@ abstract class DB
     {
         $result = $this->connection->query($query_string);
 
-        if ($result)
+        if ($result && mysqli_num_rows($result) == 1)
             return $result->fetch_assoc();
-
+        else if ($result && mysqli_num_rows($result) > 1)
+            return $result->fetch_all(MYSQLI_ASSOC);
         return [];
     }
 

@@ -8,10 +8,10 @@ TRUNCATE user_location;
 TRUNCATE user_race_fk;
 TRUNCATE waypoint;
 
-INSERT INTO user (email, nickname, password)
-VALUES ('testa@aa.ca', 'tester', 'asda');
-INSERT INTO user (email, nickname, password)
-VALUES ("test@q.xc", 'testear', 'asda');
+INSERT INTO user (email, nickname, password,session_pwd)
+VALUES ('testa@aa.ca', 'tester', 'asda','a');
+INSERT INTO user (email, nickname, password,session_pwd)
+VALUES ("test@q.xc", 'testear', 'asda','aasd');
 
 INSERT INTO car (user_id, name, brand, hp, car_type)
 VALUES (1, 'Denise', 'Toyota', '100', 'Corrola');
@@ -34,6 +34,10 @@ VALUES (1, CURRENT_TIMESTAMP, 14.11, 12.11, 1.0);
 
 INSERT INTO user_race_fk (race_id, user_id, car_id)
 VALUES (1, 1, 1);
+
+INSERT INTO user_race_fk (race_id, user_id, car_id)
+VALUES (1, 2, 1);
+
 
 INSERT INTO waypoint (race_id, latitude, longitude, height)
 VALUES (1, 14.11, 12.11, 1);

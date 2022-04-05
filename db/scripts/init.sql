@@ -84,18 +84,25 @@ ALTER TABLE race
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
 CREATE TABLE `User`
 (
-    user_id  INTEGER            NOT NULL AUTO_INCREMENT,
-    email VARCHAR(50)        NOT NULL,
-    nickname VARCHAR(50)        NOT NULL,
-    password LONGTEXT           NOT NULL,
-    karma    SMALLINT DEFAULT 0 NOT NULL,
-    PRIMARY KEY (user_id)
+    user_id     INTEGER            NOT NULL AUTO_INCREMENT,
+    email       VARCHAR(50)        NOT NULL,
+    nickname    VARCHAR(50)        NOT NULL,
+    password    LONGTEXT           NOT NULL,
+    karma       SMALLINT DEFAULT 0 NOT NULL,
+    session_pwd VARCHAR(40)        NOT NULL,
+    PRIMARY KEY (user_id),
+    UNIQUE (session_pwd)
 ) AUTO_INCREMENT = 1;
 
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
 CREATE UNIQUE INDEX user__idx ON
     `User` (
             user_id
+            ASC);
+
+CREATE UNIQUE INDEX user__ssid ON
+    `User` (
+            session_pwd
             ASC);
 
 ALTER TABLE `User`

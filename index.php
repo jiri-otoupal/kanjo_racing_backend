@@ -1,10 +1,14 @@
 <?php
-require "db/models/User.php";
+require_once "db/models/User.php";
+
 
 header("Access-Control-Allow-Origin: *");
-echo "Welcome to Kanjo Backend";
 
 $user = new User();
 
-echo $user->register("jiri-otoupal@ips-database.eu","opaka","medved");
-echo (int)$user->login("jiri-otoupal@ips-database.eu","medved");
+$user->register("jiri-otoupal@ips-database.eu", "opaka", "medved");
+$res = $user->login("jiri-otoupal@ips-database.eu", "medved");
+
+echo "Welcome to Kanjo Backend\n";
+echo "$res\n";
+echo $_SESSION["session_id"];
