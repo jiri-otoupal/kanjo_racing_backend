@@ -1,19 +1,17 @@
 <?php
 
-
-
-
-
 require_once realpath(dirname(__FILE__) . '/..') . "/db/models/User.php";
 prepareJsonAPI();
 session_start();
 
-$session_id = $_SESSION["session_id"];
 
-if (!isset($session_id)) {
-    echo json_encode(fail());
+
+if (!isset($_SESSION["session_id"])) {
+    echo json_encode(fail("Not Signed In"));
     return;
 }
+
+$session_id = $_SESSION["session_id"];
 
 $user = new User();
 $res = $user->auth($session_id);

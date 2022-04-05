@@ -11,10 +11,10 @@ function randomPassword($length)
     return implode($pass); //turn the array into a string
 }
 
-function fail()
+function fail($msg="Login Failed")
 {
     $response = array();
-    $response["message"] = "Login Failed";
+    $response["message"] = $msg;
     $response["status"] = "FAIL";
     return $response;
 }
@@ -22,4 +22,6 @@ function fail()
 function prepareJsonAPI(){
     header("Access-Control-Allow-Origin: *");
     header('Content-Type: application/json; charset=utf-8');
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Allow-Headers: X-Requested-With, Origin, Content-Type, X-CSRF-Token, Accept');
 }

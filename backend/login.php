@@ -6,7 +6,6 @@ prepareJsonAPI();
 
 
 
-
 if (!isset($_POST["email"]) || !isset($_POST["password"])) {
     echo json_encode(fail());
     return;
