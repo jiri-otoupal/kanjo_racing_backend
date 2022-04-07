@@ -1,25 +1,20 @@
 use kanjo_racing;
 
 SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE user;
-TRUNCATE car;
-TRUNCATE race;
-TRUNCATE user_location;
-TRUNCATE user_race_fk;
-TRUNCATE waypoint;
+
 
 INSERT INTO user (email, nickname, password,session_pwd)
-VALUES ('testa@aa.ca', 'tester', 'asda','a');
+VALUES ('testa@aa.ca', 'tester', 'asda','aqq');
 INSERT INTO user (email, nickname, password,session_pwd)
 VALUES ("test@q.xc", 'testear', 'asda','aasd');
 
-INSERT INTO car (user_id, name, brand, hp, car_type)
+INSERT INTO car (user_id, name, brand, hp, vehicle_type)
 VALUES (1, 'Denise', 'Toyota', '100', 'Corrola');
-INSERT INTO car (user_id, name, brand, hp, car_type)
+INSERT INTO car (user_id, name, brand, hp, vehicle_type)
 VALUES (1, 'Aray', 'Mazda', '110', 'MX-5');
-INSERT INTO car (user_id, name, brand, hp, car_type)
+INSERT INTO car (user_id, name, brand, hp, vehicle_type)
 VALUES (2, 'Gras', 'Toyota', '180', 'Yaris');
-INSERT INTO car (user_id, name, brand, hp, car_type)
+INSERT INTO car (user_id, name, brand, hp, vehicle_type)
 VALUES (2, 'Lisa', 'BMW', '180', 'X5');
 
 INSERT INTO race (name, start_time, latitude, longitude, height)

@@ -39,7 +39,9 @@ abstract class DB
 
     protected function escape($string)
     {
-        return mysqli_real_escape_string($this->connection, $string);
+        if($string==null)
+            return null;
+        return mysqli_escape_string($this->connection, $string);
     }
 
     protected function query($query_string)

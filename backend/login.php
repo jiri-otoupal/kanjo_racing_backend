@@ -19,6 +19,7 @@ $response = array();
 if ($res) {
     $response["message"] = "Logged in Successfully";
     $response["status"] = "OK";
+    $response["cookie"] = $_COOKIE["session_id"];
 } else {
     $response = fail();
 }

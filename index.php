@@ -11,4 +11,4 @@ $res = $user->login("jiri-otoupal@ips-database.eu", "medved");
 
 echo "Welcome to Kanjo Backend\n";
 echo "$res\n";
-echo $_SESSION["session_id"];
+echo $_COOKIE["session_id"];

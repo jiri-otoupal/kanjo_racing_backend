@@ -63,12 +63,13 @@ class User extends DB
         if (password_verify($password, $res["password"])) {
             $this->id = $res["user_id"];
             $randomPassword = randomPassword(16);
-            session_set_cookie_params(COOKIE_EXPIRE);
-            if (isset($_SESSION["session_id"]))
-                session_destroy();
-            session_start();
+            //session_set_cookie_params(COOKIE_EXPIRE);
+            //if (isset($_SESSION["session_id"]))
+            //    session_destroy();
+            //session_start();
+            setcookie("session_id", $randomPassword, COOKIE_EXPIRE, "/");
 
-            $_SESSION["session_id"] = $randomPassword;
+            $_COOKIE["session_id"] = $randomPassword;
 
             $this->setSessionPWD($randomPassword);
             return true;
@@ -93,16 +94,53 @@ class User extends DB
         return $this->getIdOfEmail($escaped_email);
     }
 
-    public function addCar($name, $brand, $hp, $car_type, $img_url = null)
+    protected final function escapeCarParams($name, $brand, $hp, $vehicle_type, $img_url = null)
     {
         $escaped_name = $this->escape($name);
         $escaped_brand = $this->escape($brand);
         $escaped_hp = $this->escape($hp);
-        $escaped_car_type = $this->escape($car_type);
+        $escaped_vehicle_type = $this->escape($vehicle_type);
         $escaped_img_url = $this->escape($img_url);
 
-        return $this->non_return_query("INSERT INTO car (user_id, name, brand, hp, car_type,img_url) 
-                VALUES ('$this->id', '$name', '$brand', '$hp', '$car_type','$img_url')");
+        $escaped = array();
+        $escaped["name"] = $escaped_name;
+        $escaped["brand"] = $escaped_brand;
+        $escaped["hp"] = $escaped_hp;
+        $escaped["vehicle_type"] = $escaped_vehicle_type;
+        $escaped["img_url"] = $escaped_img_url;
+
+        return $escaped;
+    }
+
+    public function addCar($name, $brand, $hp, $vehicle_type, $img_url = null)
+    {
+        $escaped_name = $this->escape($name);
+        $escaped_brand = $this->escape($brand);
+        $escaped_hp = $this->escape($hp);
+        $escaped_car_type = $this->escape($vehicle_type);
+        $escaped_img_url = $this->escape($img_url);
+
+        return $this->non_return_query("INSERT INTO car (user_id, name, brand, hp, vehicle_type,img_url) 
+                VALUES ('$this->id', '$escaped_name', '$escaped_brand', '$escaped_hp', '$escaped_car_type','$escaped_img_url')");
+    }
+
+    public function deleteCar($id){
+        $escaped_id = $this->escape($id);
+        return $this->non_return_query("DELETE FROM car WHERE id='$escaped_id'");
+    }
+
+    public function modifyCar($id, $name, $brand, $hp, $vehicle_type, $img_url = null)
+    {
+        $escaped_id = $this->escape($id);
+        $escaped_name = $this->escape($name);
+        $escaped_brand = $this->escape($brand);
+        $escaped_hp = $this->escape($hp);
+        $escaped_car_type = $this->escape($vehicle_type);
+        $escaped_img_url = $this->escape($img_url);
+
+        return $this->non_return_query("UPDATE car SET  
+                user_id='$this->id', name='$escaped_name', brand='$escaped_brand', hp='$escaped_hp', vehicle_type='$escaped_car_type',
+               img_url='$escaped_img_url' WHERE id='$escaped_id'");
     }
 
     public function getCars()
@@ -113,6 +151,20 @@ class User extends DB
         $res = $this->query
         ("SELECT car.* FROM car JOIN user u on u.user_id = car.user_id
                                     WHERE u.user_id='$this->id'");
+
+        if (!empty($res))
+            return $res;
+        return null;
+    }
+
+    public function getCar($car_id)
+    {
+        if ($this->id == null)
+            return null;
+
+        $res = $this->query
+        ("SELECT car.* FROM car JOIN user u on u.user_id = car.user_id
+                                    WHERE u.user_id='$this->id' AND car.id='$car_id'");
 
         if (!empty($res))
             return $res;

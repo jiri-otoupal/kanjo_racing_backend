@@ -1,3 +1,3 @@
 <?php
 
-const COOKIE_EXPIRE = 1*30*24*3600;
+define("COOKIE_EXPIRE", strtotime('+30 days'));

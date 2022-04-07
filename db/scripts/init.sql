@@ -3,31 +3,31 @@ use kanjo_racing;
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
 CREATE TABLE car
 (
-    car_id   INTEGER     NOT NULL AUTO_INCREMENT,
+    id   INTEGER     NOT NULL AUTO_INCREMENT,
     user_id  INTEGER,
     name     VARCHAR(50) NOT NULL,
     brand    LONGTEXT    NOT NULL,
     hp       INTEGER     NOT NULL,
-    car_type LONGTEXT    NOT NULL,
+    vehicle_type LONGTEXT    NOT NULL,
     img_url  LONGTEXT,
-    PRIMARY KEY (car_id)
+    PRIMARY KEY (id)
 ) AUTO_INCREMENT = 1;
 
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
 CREATE UNIQUE INDEX car__idx ON
     car (
-         car_id
+         id
          ASC);
 
 ALTER TABLE car
     ADD CONSTRAINT car_name_un UNIQUE (name);
 
 ALTER TABLE car
-    ADD CONSTRAINT car_id_un UNIQUE (car_id);
+    ADD CONSTRAINT car_id_un UNIQUE (id);
 
 ALTER TABLE car
     ADD CONSTRAINT car_user_un UNIQUE (user_id,
-                                       car_id);
+                                       id);
 
 
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
@@ -152,7 +152,8 @@ CREATE TABLE user_race_fk
 (
     race_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
-    car_id  INTEGER NOT NULL
+    car_id  INTEGER NOT NULL,
+    step    INTEGER
 );
 
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
@@ -170,12 +171,12 @@ ALTER TABLE user_race_fk
 CREATE TABLE waypoint
 (
     race_id   INTEGER  NOT NULL,
-    step      SMALLINT NOT NULL AUTO_INCREMENT,
+    step      SMALLINT NOT NULL DEFAULT 1,
     latitude  DOUBLE   NOT NULL,
     longitude DOUBLE   NOT NULL,
     height    DOUBLE   NOT NULL,
     PRIMARY KEY (step, race_id)
-) AUTO_INCREMENT = 1;
+);
 
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
 CREATE UNIQUE INDEX waypoint__idx ON
@@ -203,7 +204,7 @@ ALTER TABLE user_location
 
 ALTER TABLE user_race_fk
     ADD CONSTRAINT user_race_fk_car_fk FOREIGN KEY (car_id)
-        REFERENCES car (car_id)
+        REFERENCES car (id)
         ON DELETE CASCADE;
 
 ALTER TABLE user_race_fk
