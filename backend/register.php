@@ -16,5 +16,5 @@ if ($res) {
     $response["message"] = "User Exists";
     $response["status"] = "FAIL";
 }
-
+$response["success"] = true;
 echo json_encode($response);

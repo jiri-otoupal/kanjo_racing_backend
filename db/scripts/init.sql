@@ -3,13 +3,13 @@ use kanjo_racing;
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
 CREATE TABLE car
 (
-    id   INTEGER     NOT NULL AUTO_INCREMENT,
-    user_id  INTEGER,
-    name     VARCHAR(50) NOT NULL,
-    brand    LONGTEXT    NOT NULL,
-    hp       INTEGER     NOT NULL,
+    id           INTEGER     NOT NULL AUTO_INCREMENT,
+    user_id      INTEGER,
+    name         VARCHAR(50) NOT NULL,
+    brand        LONGTEXT    NOT NULL,
+    hp           INTEGER     NOT NULL,
     vehicle_type LONGTEXT    NOT NULL,
-    img_url  LONGTEXT,
+    img_url      LONGTEXT,
     PRIMARY KEY (id)
 ) AUTO_INCREMENT = 1;
 
@@ -124,11 +124,10 @@ ALTER TABLE `User`
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
 CREATE TABLE user_location
 (
-    user_id   INTEGER     NOT NULL,
-    time      DATETIME(6) NOT NULL,
-    latitude  DOUBLE      NOT NULL,
-    longitude DOUBLE      NOT NULL,
-    height    DOUBLE      NOT NULL
+    user_id   INTEGER   NOT NULL,
+    time      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    latitude  DOUBLE    NOT NULL,
+    longitude DOUBLE    NOT NULL
 );
 
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
@@ -146,6 +145,7 @@ ALTER TABLE user_location
 ALTER TABLE user_location
     ADD CONSTRAINT user_loc_id UNIQUE (user_id,
                                        time);
+
 
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
 CREATE TABLE user_race_fk

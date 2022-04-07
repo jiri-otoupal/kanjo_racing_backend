@@ -3,6 +3,7 @@
 require_once realpath(dirname(__FILE__) . '/..') . "/db/models/User.php";
 prepareJsonAPI();
 
+
 if (($session_id = $_POST["session_id"]) === null) {
     echo json_encode(fail("Not Signed In"));
     return;
@@ -15,12 +16,11 @@ $res = $user->auth($session_id);
 $response = array();
 
 if ($res) {
-    $req_res = $user->getRaces();
-    $response["message"] = "Authenticated Successfully";
-    $response["status"] = "OK";
-    $response["cars"] = $req_res;
+    $req_res = $user->addLocation($_POST["latitude"], $_POST["longitude"]);
+    $response["success"] = true;
 } else {
+    $response["success"] = false;
     $response = fail();
 }
-$response["success"] = true;
+
 echo json_encode($response);

@@ -124,7 +124,8 @@ class User extends DB
                 VALUES ('$this->id', '$escaped_name', '$escaped_brand', '$escaped_hp', '$escaped_car_type','$escaped_img_url')");
     }
 
-    public function deleteCar($id){
+    public function deleteCar($id)
+    {
         $escaped_id = $this->escape($id);
         return $this->non_return_query("DELETE FROM car WHERE id='$escaped_id'");
     }
@@ -141,6 +142,14 @@ class User extends DB
         return $this->non_return_query("UPDATE car SET  
                 user_id='$this->id', name='$escaped_name', brand='$escaped_brand', hp='$escaped_hp', vehicle_type='$escaped_car_type',
                img_url='$escaped_img_url' WHERE id='$escaped_id'");
+    }
+
+    public function addLocation($latitude, $longitude)
+    {
+
+        $this->non_return_query("DELETE FROM user_location WHERE time < NOW() - INTERVAL 1 MINUTE");
+
+        return $this->non_return_query("INSERT INTO user_location (user_id,latitude,longitude) VALUES ('$this->id','$latitude','$longitude')");
     }
 
     public function getCars()
