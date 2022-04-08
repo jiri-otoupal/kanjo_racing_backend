@@ -16,7 +16,7 @@ abstract class DB
     /**
      * @var mysqli
      */
-    protected $connection;
+    public $connection;
 
     public function __construct()
     {
@@ -39,10 +39,16 @@ abstract class DB
 
     protected function escape($string)
     {
-        if($string==null)
+        if ($string == null)
             return null;
         return mysqli_escape_string($this->connection, $string);
     }
+
+    public function commit()
+    {
+        $this->connection->commit();
+    }
+
 
     protected function query($query_string)
     {

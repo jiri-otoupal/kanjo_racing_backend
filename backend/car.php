@@ -2,7 +2,7 @@
 
 require_once realpath(dirname(__FILE__) . '/..') . "/db/models/User.php";
 prepareJsonAPI();
-session_start();
+
 
 
 if (($session_id = $_POST["session_id"]) === null) {

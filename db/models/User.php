@@ -66,7 +66,7 @@ class User extends DB
             //session_set_cookie_params(COOKIE_EXPIRE);
             //if (isset($_SESSION["session_id"]))
             //    session_destroy();
-            //session_start();
+            //
             setcookie("session_id", $randomPassword, COOKIE_EXPIRE, "/");
 
             $_COOKIE["session_id"] = $randomPassword;
@@ -130,9 +130,9 @@ class User extends DB
         return $this->non_return_query("DELETE FROM car WHERE id='$escaped_id'");
     }
 
-    public function modifyCar($id, $name, $brand, $hp, $vehicle_type, $img_url = null)
+    public function modifyCar($car_id, $name, $brand, $hp, $vehicle_type, $img_url = null)
     {
-        $escaped_id = $this->escape($id);
+        $escaped_id = $this->escape($car_id);
         $escaped_name = $this->escape($name);
         $escaped_brand = $this->escape($brand);
         $escaped_hp = $this->escape($hp);
@@ -171,9 +171,10 @@ class User extends DB
         if ($this->id == null)
             return null;
 
+        $escaped_id = $this->escape($car_id);
         $res = $this->query
         ("SELECT car.* FROM car JOIN user u on u.user_id = car.user_id
-                                    WHERE u.user_id='$this->id' AND car.id='$car_id'");
+                                    WHERE u.user_id='$this->id' AND car.id='$escaped_id'");
 
         if (!empty($res))
             return $res;
@@ -196,10 +197,6 @@ class User extends DB
         return $this->query("SELECT user_id FROM user WHERE email='$escaped_email'");
     }
 
-    public function commit()
-    {
-        $this->connection->commit();
-    }
 
     public function getProfile()
     {

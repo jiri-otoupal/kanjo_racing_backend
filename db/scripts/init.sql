@@ -38,19 +38,19 @@ CREATE TABLE race
     start_time    DATETIME(6)  NOT NULL,
     latitude      DOUBLE       NOT NULL,
     longitude     DOUBLE       NOT NULL,
-    height        DOUBLE       NOT NULL,
-    min_racers    INTEGER,
-    max_racers    INTEGER,
-    max_hp        INTEGER,
-    password      VARCHAR(10),
-    heat_grade    VARCHAR(30) COMMENT 'Enum:
+    owner_id      INTEGER      NOT NULL,
+    min_racers    INTEGER DEFAULT NULL,
+    max_racers    INTEGER DEFAULT NULL,
+    max_hp        INTEGER DEFAULT NULL,
+    password      VARCHAR(10) DEFAULT NULL,
+    heat_grade    VARCHAR(30) DEFAULT NULL COMMENT 'Enum:
 All laws respect
 Offense Only
 Traffic lights respect
 No rules',
-    min_req_karma SMALLINT,
-    chat_link     LONGTEXT,
-    img_url       LONGTEXT,
+    min_req_karma SMALLINT DEFAULT NULL,
+    chat_link     LONGTEXT DEFAULT NULL,
+    img_url       LONGTEXT DEFAULT NULL,
     PRIMARY KEY (race_id)
 ) AUTO_INCREMENT = 1;
 
@@ -78,8 +78,7 @@ ALTER TABLE race
     ADD CONSTRAINT race__un UNIQUE (name,
                                     start_time,
                                     latitude,
-                                    longitude,
-                                    height);
+                                    longitude );
 
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
 CREATE TABLE `User`
@@ -153,7 +152,8 @@ CREATE TABLE user_race_fk
     race_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     car_id  INTEGER NOT NULL,
-    step    INTEGER
+    step    INTEGER,
+    lap INTEGER
 );
 
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
@@ -174,7 +174,6 @@ CREATE TABLE waypoint
     step      SMALLINT NOT NULL DEFAULT 1,
     latitude  DOUBLE   NOT NULL,
     longitude DOUBLE   NOT NULL,
-    height    DOUBLE   NOT NULL,
     PRIMARY KEY (step, race_id)
 );
 
@@ -189,8 +188,7 @@ CREATE UNIQUE INDEX waypoint__idx ON
 
 ALTER TABLE waypoint
     ADD CONSTRAINT waypoint__un UNIQUE (latitude,
-                                        longitude,
-                                        height);
+                                        longitude);
 
 ALTER TABLE car
     ADD CONSTRAINT car_user_fk FOREIGN KEY (user_id)
