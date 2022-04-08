@@ -66,9 +66,15 @@ class Race extends DB
         $escaped_img_url = $this->escape($img_url);
 
         $prepared = $this->connection->prepare($query_string);
-        $prepared->bind_param($type_string, $escaped_rid, $escaped_name, $escaped_start_time, $escaped_lat, $escaped_lng, $escaped_owner_id,
+
+        $params = [$escaped_rid, $escaped_name, $escaped_start_time, $escaped_lat, $escaped_lng, $escaped_owner_id,
             $escaped_min_r, $escaped_max_r, $escaped_max_hp, $escaped_password, $escaped_heat_grade,
-            $escaped_min_karma, $escaped_chat_link, $escaped_img_url, $where_id);
+            $escaped_min_karma, $escaped_chat_link, $escaped_img_url];
+
+        if(!is_null($where_id))
+            $params[] = $where_id;
+
+        $prepared->bind_param($type_string, ...$params);
         return $prepared->execute();
     }
 
