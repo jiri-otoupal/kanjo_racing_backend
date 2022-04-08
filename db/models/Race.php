@@ -24,12 +24,12 @@ class Race extends DB
 
     public function getRace($id)
     {
-
-        if ($this->id == null)
+        if ($id == null)
             return null;
+
         $escaped_id = $this->escape($id);
         $res = $this->query
-        ("SELECT * FROM race WHERE race_id='$escaped_id'");
+        ("SELECT race_id FROM race WHERE race_id='$escaped_id'");
 
         if (!empty($res))
             return $res;
@@ -65,17 +65,19 @@ class Race extends DB
         $escaped_chat_link = $this->escape($chat_link);
         $escaped_img_url = $this->escape($img_url);
 
-
-        return $this->non_return_query("INSERT INTO race
-        (race_id, name, start_time, latitude, longitude, owner_id, min_racers, max_racers, max_hp, password, heat_grade, min_req_karma, chat_link, img_url) 
+        $prepared = $this->connection->prepare("INSERT INTO race
         VALUES 
-               ('$escaped_rid','$escaped_name','$escaped_start_time','$escaped_lat','$escaped_lng','$escaped_owner_id',
-                '$escaped_min_r','$escaped_max_r','$escaped_max_hp','$escaped_password','$escaped_heat_grade',
-                '$escaped_min_karma','$escaped_chat_link','$escaped_img_url')");
+               (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        $prepared->bind_param("issddiiiississ", $escaped_rid, $escaped_name, $escaped_start_time, $escaped_lat, $escaped_lng, $escaped_owner_id,
+            $escaped_min_r, $escaped_max_r, $escaped_max_hp, $escaped_password, $escaped_heat_grade,
+            $escaped_min_karma, $escaped_chat_link, $escaped_img_url);
+
+        return $prepared->execute();
     }
 
     public function modifyRace($race_id, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $img_url = null)
     {
+        //TODO: Merge duplicity
         $escaped_rid = $this->escape($race_id);
         $escaped_name = $this->escape($name);
         $escaped_start_time = $this->escape($start_time);
@@ -91,13 +93,18 @@ class Race extends DB
         $escaped_chat_link = $this->escape($chat_link);
         $escaped_img_url = $this->escape($img_url);
 
-        return $this->non_return_query("UPDATE race SET  
-                race_id='$escaped_rid',name='$escaped_name',start_time='$escaped_start_time',
-                latitude='$escaped_lat',longitude='$escaped_lng',owner_id='$escaped_owner_id',min_racers='$escaped_min_r',
-                             max_racers='$escaped_max_r',max_hp='$escaped_max_hp',password='$escaped_password',
-                             heat_grade='$escaped_heat_grade',min_req_karma='$escaped_min_karma',
-                             chat_link='$escaped_chat_link',img_url='$escaped_img_url'
-             WHERE race_id='$escaped_rid'");
+        $prepared = $this->connection->prepare("UPDATE race SET  
+                race_id=?,name=?,start_time=?,
+                latitude=?,longitude=?,owner_id=?,min_racers=?,
+                             max_racers=?,max_hp=?,password=?,
+                             heat_grade=?,min_req_karma=?,
+                             chat_link=?,img_url=?
+             WHERE race_id=?");
+        $prepared->bind_param("issddiiiississi", $escaped_rid, $escaped_name, $escaped_start_time, $escaped_lat, $escaped_lng, $escaped_owner_id,
+            $escaped_min_r, $escaped_max_r, $escaped_max_hp, $escaped_password, $escaped_heat_grade,
+            $escaped_min_karma, $escaped_chat_link, $escaped_img_url, $escaped_rid);
+
+        return $prepared->execute();
     }
 
     public function deleteRace($id)

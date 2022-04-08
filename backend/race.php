@@ -20,12 +20,13 @@ function checkIfEmpty($var){
 $user = new User();
 $res = $user->auth($session_id);
 
+
 $race = new Race();
 
 
 
 if ($res) {
-    if (!isset($_POST["race_id"]) && !isset($_POST["waypoints"])) {
+    if (!isset($_POST["race_id"]) && !isset($_POST["waypoints"])&& !isset($_POST["delete"])) {
         $response = array();
         $req_res = $race->getAll();
         $response["message"] = "Authenticated Successfully";
@@ -78,22 +79,26 @@ if ($res) {
         $chat_link = $_POST["chat_link"];
         $owner_id = $user->getId();
 
+        $operation = null;
 
         if ($race->getRace($race_id) == null) {
+            $operation="add";
             $res = $race->add($race_id, $name, $start_time, $lat, $lng, $owner_id, $min_racers,
                 $max_racers, $max_hp, $pass, $heat_grade, $min_karma, $chat_link, $img_url);
             $response["message"] = "Success Inserted New Race";
+
         } else {
+            $operation = "modify";
             $res = $race->modifyRace($race_id, $name, $start_time, $lat, $lng, $owner_id, $min_racers,
                 $max_racers, $max_hp, $pass, $heat_grade, $min_karma, $chat_link, $img_url);
             $response["message"] = "Success Modified Race";
-
         }
+
         if ($res) {
             $response["status"] = "OK";
             $race->commit();
         } else {
-            $response = fail("Failed to modify/add race ".$race->connection->error);
+            $response = fail("Failed to ".$operation." race ".$race->connection->error);
         }
     }
 } else {
