@@ -19,7 +19,7 @@ if ($res) {
     $req_res = $user->getRaces();
     $response["message"] = "Authenticated Successfully";
     $response["status"] = "OK";
-    $response["cars"] = $req_res;
+    $response["waypoints"] = $req_res;
 } else {
     $response = fail();
 }

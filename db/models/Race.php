@@ -48,7 +48,7 @@ class Race extends DB
                                                                  ('$escaped_raceId','$escaped_step','$escaped_lat','$escaped_lng')");
     }
 
-    public function bindForEdit($query_string, $type_string, $rid, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $img_url = null, $where_id = null)
+    public function bindForEdit($query_string, $type_string, $rid, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $img_url = null, $laps = 1, $where_id = null)
     {
         $escaped_rid = $this->escape($rid);
         $escaped_name = $this->escape($name);
@@ -63,31 +63,32 @@ class Race extends DB
         $escaped_heat_grade = $this->escape($heat_grade);
         $escaped_min_karma = $this->escape($min_karma);
         $escaped_chat_link = $this->escape($chat_link);
+        $escaped_laps = $this->escape($laps);
         $escaped_img_url = $this->escape($img_url);
 
         $prepared = $this->connection->prepare($query_string);
 
         $params = [$escaped_rid, $escaped_name, $escaped_start_time, $escaped_lat, $escaped_lng, $escaped_owner_id,
             $escaped_min_r, $escaped_max_r, $escaped_max_hp, $escaped_password, $escaped_heat_grade,
-            $escaped_min_karma, $escaped_chat_link, $escaped_img_url];
+            $escaped_min_karma, $escaped_chat_link, $escaped_laps, $escaped_img_url];
 
-        if(!is_null($where_id))
+        if (!is_null($where_id))
             $params[] = $where_id;
 
         $prepared->bind_param($type_string, ...$params);
         return $prepared->execute();
     }
 
-    public function add($rid, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $img_url = null)
+    public function add($rid, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $laps = 1, $img_url = null)
     {
         $query_string = "INSERT INTO race
         VALUES 
-               (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        $types = "issddiiiississ";
-        return $this->bindForEdit($query_string, $types, $rid, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $img_url);
+               (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        $types = "issddiiiississi";
+        return $this->bindForEdit($query_string, $types, $rid, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $laps, $img_url);
     }
 
-    public function modifyRace($race_id, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $img_url = null)
+    public function modifyRace($race_id, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $img_url = null, $laps = 1)
     {
         $query_string = "UPDATE race SET  
                 race_id=?,name=?,start_time=?,
@@ -96,9 +97,10 @@ class Race extends DB
                              heat_grade=?,min_req_karma=?,
                              chat_link=?,img_url=?
              WHERE race_id=?";
-        $types = "issddiiiississi";
+        $types = "issddiiiississii";
 
-        return $this->bindForEdit($query_string, $types, $race_id, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $img_url, $race_id);
+        return $this->bindForEdit($query_string, $types, $race_id, $name, $start_time, $lat, $lng, $owner_id, $min_r,
+            $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $laps, $img_url, $race_id);
     }
 
     public function deleteRace($id)

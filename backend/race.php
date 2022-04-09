@@ -11,8 +11,9 @@ if (($session_id = $_POST["session_id"]) === null) {
     return;
 }
 
-function checkIfEmpty($var){
-    if(empty($var))
+function checkIfEmpty($var)
+{
+    if (empty($var))
         return null;
     return $var;
 }
@@ -24,9 +25,8 @@ $res = $user->auth($session_id);
 $race = new Race();
 
 
-
 if ($res) {
-    if (!isset($_POST["race_id"]) && !isset($_POST["waypoints"])&& !isset($_POST["delete"])) {
+    if (!isset($_POST["race_id"]) && !isset($_POST["waypoints"]) && !isset($_POST["delete"])) {
         $response = array();
         $req_res = $race->getAll();
         $response["message"] = "Authenticated Successfully";
@@ -72,25 +72,26 @@ if ($res) {
 
         $min_racers = $_POST["min_racers"];
         $max_racers = $_POST["max_racers"];
-        $max_hp =$_POST["max_hp"];
+        $max_hp = $_POST["max_hp"];
         $pass = $_POST["password"];
         $heat_grade = $_POST["heat_grade"];
         $min_karma = $_POST["min_req_karma"];
         $chat_link = $_POST["chat_link"];
+        $laps = $_POST["laps"];
         $owner_id = $user->getId();
 
         $operation = null;
 
         if ($race->getRace($race_id) == null) {
-            $operation="add";
+            $operation = "add";
             $res = $race->add($race_id, $name, $start_time, $lat, $lng, $owner_id, $min_racers,
-                $max_racers, $max_hp, $pass, $heat_grade, $min_karma, $chat_link, $img_url);
+                $max_racers, $max_hp, $pass, $heat_grade, $min_karma, $chat_link, $laps, $img_url);
             $response["message"] = "Success Inserted New Race";
 
         } else {
             $operation = "modify";
             $res = $race->modifyRace($race_id, $name, $start_time, $lat, $lng, $owner_id, $min_racers,
-                $max_racers, $max_hp, $pass, $heat_grade, $min_karma, $chat_link, $img_url);
+                $max_racers, $max_hp, $pass, $heat_grade, $min_karma, $chat_link, $laps, $img_url);
             $response["message"] = "Success Modified Race";
         }
 
@@ -98,7 +99,7 @@ if ($res) {
             $response["status"] = "OK";
             $race->commit();
         } else {
-            $response = fail("Failed to ".$operation." race ".$race->connection->error);
+            $response = fail("Failed to " . $operation . " race " . $race->connection->error);
         }
     }
 } else {

@@ -51,6 +51,7 @@ No rules',
     min_req_karma SMALLINT DEFAULT NULL,
     chat_link     LONGTEXT DEFAULT NULL,
     img_url       LONGTEXT DEFAULT NULL,
+    laps          SMALLINT DEFAULT NULL,
     PRIMARY KEY (race_id)
 ) AUTO_INCREMENT = 1;
 
