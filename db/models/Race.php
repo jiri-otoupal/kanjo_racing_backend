@@ -18,7 +18,31 @@ class Race extends DB
 
     public function getAll()
     {
-        return $this->query("SELECT * FROM race");
+        $results = $this->query("SELECT race.race_id                                                                      as race_id
+             , race.name                                                                         as name
+             , race.start_time                                                                   as start_time
+             , race.latitude                                                                     as latitude
+             , race.longitude                                                                    as longitude
+             , race.owner_id                                                                     as owner_id
+             , race.min_racers                                                                   as min_racers
+             , race.max_racers                                                                   as max_racers
+             , race.max_hp                                                                       as max_hp
+             , race.password                                                                     as password
+             , race.heat_grade                                                                   as heat_grade
+             , race.min_req_karma                                                                as min_req_karma
+             , race.chat_link                                                                    as chat_link
+             , race.img_url                                                                      as img_url
+             , CONCAT(
+                '[', GROUP_CONCAT(JSON_OBJECT('step',step, 'lat', w.latitude, 'lng', w.longitude) ORDER BY step),']') as waypoints
+        FROM race
+                 LEFT JOIN waypoint w on race.race_id = w.race_id
+        GROUP BY race.race_id;");
+
+        // Decode JSON from database waypoint selection concat
+        for ($i = 0; $i < sizeof($results); $i++)
+            $results[$i]["waypoints"] = json_decode($results[$i]["waypoints"]);
+
+        return $results;
     }
 
 
