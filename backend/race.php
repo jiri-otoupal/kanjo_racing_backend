@@ -33,24 +33,8 @@ if ($res) {
         $response["status"] = "OK";
         $response["races"] = $req_res;
 
-    } else if (isset($_POST["waypoints"])) {
-        $waypoints = $_POST["waypoints"];
-        foreach ($waypoints as $waypoint) {
-            $res = $race->addWaypoint($_POST["race_id"], $waypoint["step"], $waypoint["lat"], $waypoint["lng"]);
-            if (!$res)
-                $response["message"] = "Failed to insert waypoint";
-        }
-
-        if ($res) {
-            $response["message"] = "Waypoints Inserted";
-            $response["status"] = "OK";
-            $user->commit();
-        } else {
-            $response = fail("Failed to delete car");
-        }
-
     } else if (isset($_POST["race_id"]) && isset($_POST["delete"])) {
-        $res = $race->deleteRace($_POST["race_id"]);
+        $res = $race->deleteRace($_POST["race_id"], $user->getId());
         if ($res) {
             $response["message"] = "Deleted Successfully";
             $response["status"] = "OK";
@@ -82,17 +66,38 @@ if ($res) {
 
         $operation = null;
 
+
         if ($race->getRace($race_id) == null) {
             $operation = "add";
-            $res = $race->add($race_id, $name, $start_time, $lat, $lng, $owner_id, $min_racers,
+            $res = $race->add($name, $start_time, $lat, $lng, $owner_id, $min_racers,
                 $max_racers, $max_hp, $pass, $heat_grade, $min_karma, $chat_link, $laps, $img_url);
             $response["message"] = "Success Inserted New Race";
+            $race_id = mysqli_insert_id($race->connection);
 
         } else {
             $operation = "modify";
             $res = $race->modifyRace($race_id, $name, $start_time, $lat, $lng, $owner_id, $min_racers,
                 $max_racers, $max_hp, $pass, $heat_grade, $min_karma, $chat_link, $laps, $img_url);
             $response["message"] = "Success Modified Race";
+        }
+
+        if (isset($_POST["waypoints"])) {
+            //TODO: clear previous waypoints
+            $waypoints = $_POST["waypoints"];
+            foreach ($waypoints as $waypoint) {
+                $res = $race->addWaypoint($race_id, $waypoint["step"], $waypoint["lat"], $waypoint["lng"]);
+                if (!$res)
+                    $response["message"] = "Failed to insert waypoint";
+            }
+
+            if ($res) {
+                $response["message"] = "Waypoints Inserted";
+                $response["status"] = "OK";
+                $user->commit();
+            } else {
+                $response = fail("Failed to insert waypoint");
+            }
+
         }
 
         if ($res) {

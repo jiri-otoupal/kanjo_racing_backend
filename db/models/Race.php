@@ -18,20 +18,7 @@ class Race extends DB
 
     public function getAll()
     {
-        $results = $this->query("SELECT race.race_id                                                                      as race_id
-             , race.name                                                                         as name
-             , race.start_time                                                                   as start_time
-             , race.latitude                                                                     as latitude
-             , race.longitude                                                                    as longitude
-             , race.owner_id                                                                     as owner_id
-             , race.min_racers                                                                   as min_racers
-             , race.max_racers                                                                   as max_racers
-             , race.max_hp                                                                       as max_hp
-             , race.password                                                                     as password
-             , race.heat_grade                                                                   as heat_grade
-             , race.min_req_karma                                                                as min_req_karma
-             , race.chat_link                                                                    as chat_link
-             , race.img_url                                                                      as img_url
+        $results = $this->query("SELECT race.*
              , CONCAT(
                 '[', GROUP_CONCAT(JSON_OBJECT('step',step, 'lat', w.latitude, 'lng', w.longitude) ORDER BY step),']') as waypoints
         FROM race
@@ -96,6 +83,10 @@ class Race extends DB
             $escaped_min_r, $escaped_max_r, $escaped_max_hp, $escaped_password, $escaped_heat_grade,
             $escaped_min_karma, $escaped_chat_link, $escaped_laps, $escaped_img_url];
 
+        if(is_null($rid))
+            unset($params[0]);
+
+
         if (!is_null($where_id))
             $params[] = $where_id;
 
@@ -103,13 +94,13 @@ class Race extends DB
         return $prepared->execute();
     }
 
-    public function add($rid, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $laps = 1, $img_url = null)
+    public function add($name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $laps = 1, $img_url = null)
     {
-        $query_string = "INSERT INTO race
+        $query_string = "INSERT INTO kanjo_racing.race (name, start_time, latitude, longitude, owner_id, min_racers, max_racers, max_hp, password, heat_grade, min_req_karma, chat_link, laps, img_url)
         VALUES 
-               (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        $types = "issddiiiississi";
-        return $this->bindForEdit($query_string, $types, $rid, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $laps, $img_url);
+               (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        $types = "ssddiiiissisis";
+        return $this->bindForEdit($query_string, $types, null, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $laps, $img_url);
     }
 
     public function modifyRace($race_id, $name, $start_time, $lat, $lng, $owner_id, $min_r, $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $img_url = null, $laps = 1)
@@ -119,7 +110,7 @@ class Race extends DB
                 latitude=?,longitude=?,owner_id=?,min_racers=?,
                              max_racers=?,max_hp=?,password=?,
                              heat_grade=?,min_req_karma=?,
-                             chat_link=?,img_url=?
+                             chat_link=?,img_url=?,laps=?
              WHERE race_id=?";
         $types = "issddiiiississii";
 
@@ -127,9 +118,10 @@ class Race extends DB
             $max_r, $max_hp, $password, $heat_grade, $min_karma, $chat_link, $laps, $img_url, $race_id);
     }
 
-    public function deleteRace($id)
+    public function deleteRace($id, $user_id)
     {
+        //TODO: escape
         $escaped_id = $this->escape($id);
-        return $this->non_return_query("DELETE FROM race WHERE race_id='$escaped_id'");
+        return $this->non_return_query("DELETE FROM race WHERE race_id='$escaped_id' AND owner_id='$user_id'");
     }
 }
