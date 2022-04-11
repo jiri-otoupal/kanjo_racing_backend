@@ -146,10 +146,23 @@ class User extends DB
 
     public function addLocation($latitude, $longitude)
     {
+        $escaped_lat = $latitude;
+        $escaped_lng = $longitude;
 
         $this->non_return_query("DELETE FROM user_location WHERE time < NOW() - INTERVAL 1 MINUTE");
 
-        return $this->non_return_query("INSERT INTO user_location (user_id,latitude,longitude) VALUES ('$this->id','$latitude','$longitude')");
+        return $this->non_return_query("INSERT INTO user_location (user_id,latitude,longitude) 
+                VALUES ('$this->id','$escaped_lat','$escaped_lng')");
+    }
+
+    public function getUserLocations()
+    {
+        return $this->query("SELECT user_location.*, u2.nickname
+            FROM user_location
+                     RIGHT JOIN user_race_fk u on user_location.user_id = u.user_id
+                     JOIN user u2 on u.user_id = u2.user_id
+            GROUP BY user_id
+            HAVING MAX(time)");
     }
 
     public function getCars()

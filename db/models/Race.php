@@ -13,16 +13,19 @@ class Race extends DB
         parent::__construct();
         if ($id == null)
             return;
-        $this->$id = $id;
+        $this->$id = $this->escape($id);
     }
 
     public function getAll()
     {
         $results = $this->query("SELECT race.*
              , CONCAT(
-                '[', GROUP_CONCAT(JSON_OBJECT('step',step, 'lat', w.latitude, 'lng', w.longitude) ORDER BY step),']') as waypoints
+                '[', GROUP_CONCAT(JSON_OBJECT('step', w.step, 'lat', w.latitude, 'lng', w.longitude) ORDER BY w.step),
+                ']')                                              as waypoints
+             , GROUP_CONCAT(DISTINCT (urf.user_id) SEPARATOR ',') as racers_id
         FROM race
                  LEFT JOIN waypoint w on race.race_id = w.race_id
+                 LEFT JOIN user_race_fk urf on race.race_id = urf.race_id
         GROUP BY race.race_id;");
 
         // Decode JSON from database waypoint selection concat
@@ -32,6 +35,23 @@ class Race extends DB
         return $results;
     }
 
+    public function join($user_id, $car_id,$race_id)
+    {
+        $escaped_id = $this->escape($user_id);
+        $escaped_car_id = $this->escape($car_id);
+        $escaped_race_id = $this->escape($race_id);
+
+        return $this->non_return_query("INSERT INTO kanjo_racing.user_race_fk (race_id, user_id, car_id) 
+            VALUES ('$escaped_race_id','$escaped_id','$escaped_car_id')");
+
+    }
+
+    public function leave($user_id,$race_id)
+    {
+        $escaped_id = $this->escape($user_id);
+        $escaped_race_id = $this->escape($race_id);
+        return $this->non_return_query("DELETE FROM kanjo_racing.user_race_fk WHERE user_id='$escaped_id' AND race_id='$escaped_race_id'");
+    }
 
     public function getRace($id)
     {
@@ -47,8 +67,17 @@ class Race extends DB
         return null;
     }
 
+    public function clearWaypoints($raceId)
+    {
+        $escaped_raceId = $this->escape($raceId);
+        //TODO: Secure owner_id
+
+        return $this->non_return_query("DELETE FROM waypoint WHERE race_id='$raceId'");
+    }
+
     public function addWaypoint($raceId, $step, $lat, $lng)
     {
+        //TODO: Secure owner_id
         $escaped_raceId = $this->escape($raceId);
         $escaped_step = $this->escape($step);
         $escaped_lat = $this->escape($lat);
@@ -83,7 +112,7 @@ class Race extends DB
             $escaped_min_r, $escaped_max_r, $escaped_max_hp, $escaped_password, $escaped_heat_grade,
             $escaped_min_karma, $escaped_chat_link, $escaped_laps, $escaped_img_url];
 
-        if(is_null($rid))
+        if (is_null($rid))
             unset($params[0]);
 
 
@@ -120,8 +149,9 @@ class Race extends DB
 
     public function deleteRace($id, $user_id)
     {
-        //TODO: escape
+        $escaped_user_id = $this->escape($user_id);
         $escaped_id = $this->escape($id);
-        return $this->non_return_query("DELETE FROM race WHERE race_id='$escaped_id' AND owner_id='$user_id'");
+
+        return $this->non_return_query("DELETE FROM race WHERE race_id='$escaped_id' AND owner_id='$escaped_user_id'");
     }
 }

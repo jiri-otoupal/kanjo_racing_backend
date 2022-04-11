@@ -18,6 +18,7 @@ $response = array();
 if ($res) {
     $req_res = $user->addLocation($_POST["latitude"], $_POST["longitude"]);
     $response["success"] = true;
+    $response["racers"] = $user->getUserLocations();
 } else {
     $response["success"] = false;
     $response = fail();
