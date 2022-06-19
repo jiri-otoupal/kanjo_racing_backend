@@ -11,21 +11,39 @@ if (($session_id = $_POST["session_id"]) === null) {
     return;
 }
 
-function checkIfEmpty($var)
-{
-    if (empty($var))
-        return null;
-    return $var;
-}
-
 $user = new User();
 $res = $user->auth($session_id);
 
-
+/**
+ * Check for valid response
+ */
 if ($res) {
     $response = array();
     $race = new Race();
-    if (isset($_POST["op"]) && isset($_POST["race_id"]) && ($operation = $_POST["op"]) != null && ($race_id = $_POST["race_id"]) != null) {
+    if (isset($_POST["op"]) && isset($_POST["race_id"]) && $_POST["op"] == "get_waypoints") {
+        $res = $race->getWaypoints($_POST["race_id"]);
+        if ($res) {
+            $response["message"] = "Got Waypoints for race";
+            $response["waypoints"] = $res;
+            $response["status"] = "OK";
+        } else {
+            $response["message"] = "Failed to get waypoints of race";
+            $response["status"] = "FAIL";
+        }
+    } else if (isset($_POST["op"]) && isset($_POST["user_id"]) && $_POST["op"] == "get_joined") {
+        $res = $race->getJoined($_POST["user_id"]);
+        if ($res) {
+            $response["message"] = "Got Joined races";
+            $response["races"] = $res;
+            $response["status"] = "OK";
+        } else if (mysqli_error($race->connection)) {
+            $response["message"] = "Failed to get joined races" . mysqli_error($race->connection);
+            $response["status"] = "FAIL";
+        } else {
+            $response["message"] = "No joined races";
+            $response["status"] = "OK";
+        }
+    } else if (isset($_POST["op"]) && isset($_POST["race_id"]) && ($operation = $_POST["op"]) != null && ($race_id = $_POST["race_id"]) != null) {
         $race = new Race($race_id);
         $operation = strtolower($operation);
 
@@ -33,7 +51,7 @@ if ($res) {
             $res = $race->join($user->getId(), $car_id, $race_id);
         } else if ($operation == "leave") {
             $res = $race->leave($user->getId(), $race_id);
-        }else{
+        } else {
             $res = false;
             $response["message"] = "Invalid request or missing parameters";
             $response["status"] = "FAIL";
@@ -43,6 +61,8 @@ if ($res) {
             $response["message"] = "Operation " . $operation . " succeeded";
             $response["status"] = "OK";
         } else {
+            if ($car_id == null)
+                $response["hint"] = "Missing car"; //TODO alert user
             $response["message"] = "Failed " . $race->connection->error;
         }
 
@@ -70,7 +90,7 @@ if ($res) {
             $img_url = $_POST["img_cam"];
         $race_id = $_POST["race_id"];
         $name = $_POST["name"];
-        $start_time = date('Y-m-d', strtotime(str_replace('-', '/', $_POST["start_time"])));
+        $start_time = date('Y-m-d H:i:s', strtotime(str_replace('-', '/', $_POST["start_time"])));
         $lat = $_POST["latitude"];
         $lng = $_POST["longitude"];
 
@@ -82,20 +102,22 @@ if ($res) {
         $min_karma = $_POST["min_req_karma"];
         $chat_link = $_POST["chat_link"];
         $laps = $_POST["laps"];
+
         $owner_id = $user->getId();
 
         $operation = null;
 
 
         $race_data = $race->getRace($race_id);
+
         if ($race_data == null) {
             $operation = "add";
             $res = $race->add($name, $start_time, $lat, $lng, $owner_id, $min_racers,
                 $max_racers, $max_hp, $pass, $heat_grade, $min_karma, $chat_link, $laps, $img_url);
             $response["message"] = "Success Inserted New Race";
-            $race_id = mysqli_insert_id($race->connection);
 
-        } else if ($race_data["owner_id"] == $user->getId()) {
+
+        } else if ($race_data["owner_id"] === $user->getId()) {
             $operation = "modify";
             $res = $race->modifyRace($race_id, $name, $start_time, $lat, $lng, $owner_id, $min_racers,
                 $max_racers, $max_hp, $pass, $heat_grade, $min_karma, $chat_link, $laps, $img_url);
@@ -104,6 +126,7 @@ if ($res) {
 
         if (isset($_POST["waypoints"])) {
             //TODO: clear previous waypoints
+            $race_id = mysqli_insert_id($race->connection);
             $waypoints = $_POST["waypoints"];
             foreach ($waypoints as $waypoint) {
                 $res = $race->addWaypoint($race_id, $waypoint["step"], $waypoint["lat"], $waypoint["lng"]);

@@ -14,8 +14,14 @@ if (($session_id = $_POST["session_id"]) === null) {
 $user = new User();
 $res = $user->auth($session_id);
 
+/**
+ * Check for valid response
+ */
 if ($res) {
     if (!isset($_POST["car_id"]) && !isset($_POST["delete"])) {
+        /**
+         * Just Fetch Cars
+         */
         $response = array();
 
         $req_res = $user->getCars();
@@ -24,6 +30,9 @@ if ($res) {
         $response["cars"] = $req_res;
 
     } else if (isset($_POST["delete"])) {
+        /**
+         * Delete Car
+         */
         $res = $user->deleteCar($_POST["car_id"]);
         if ($res) {
             $response["message"] = "Deleted Successfully";
@@ -35,6 +44,9 @@ if ($res) {
         }
 
     } else {
+        /**
+         * New Car Insertion
+         */
         $img_url = null;
         if (isset($_POST["img_url_upload"]))
             $img_url = $_POST["img_url_upload"];

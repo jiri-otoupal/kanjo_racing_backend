@@ -39,19 +39,19 @@ CREATE TABLE race
     latitude      DOUBLE       NOT NULL,
     longitude     DOUBLE       NOT NULL,
     owner_id      INTEGER      NOT NULL,
-    min_racers    INTEGER DEFAULT NULL,
-    max_racers    INTEGER DEFAULT NULL,
-    max_hp        INTEGER DEFAULT NULL,
+    min_racers    INTEGER     DEFAULT NULL,
+    max_racers    INTEGER     DEFAULT NULL,
+    max_hp        INTEGER     DEFAULT NULL,
     password      VARCHAR(10) DEFAULT NULL,
     heat_grade    VARCHAR(30) DEFAULT NULL COMMENT 'Enum:
 All laws respect
 Offense Only
 Traffic lights respect
 No rules',
-    min_req_karma SMALLINT DEFAULT NULL,
-    chat_link     LONGTEXT DEFAULT NULL,
-    img_url       LONGTEXT DEFAULT NULL,
-    laps          SMALLINT DEFAULT NULL,
+    min_req_karma SMALLINT    DEFAULT NULL,
+    chat_link     LONGTEXT    DEFAULT NULL,
+    img_url       LONGTEXT    DEFAULT NULL,
+    laps          SMALLINT    DEFAULT NULL,
     PRIMARY KEY (race_id)
 ) AUTO_INCREMENT = 1;
 
@@ -79,10 +79,10 @@ ALTER TABLE race
     ADD CONSTRAINT race__un UNIQUE (name,
                                     start_time,
                                     latitude,
-                                    longitude );
+                                    longitude);
 
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
-CREATE TABLE `User`
+CREATE TABLE `user`
 (
     user_id     INTEGER            NOT NULL AUTO_INCREMENT,
     email       VARCHAR(50)        NOT NULL,
@@ -96,29 +96,29 @@ CREATE TABLE `User`
 
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
 CREATE UNIQUE INDEX user__idx ON
-    `User` (
+    `user` (
             user_id
             ASC);
 
 CREATE UNIQUE INDEX user__ssid ON
-    `User` (
+    `user` (
             session_pwd
             ASC);
 
-ALTER TABLE `User`
+ALTER TABLE `user`
     ADD CONSTRAINT user_user_id_un UNIQUE (user_id);
 
-ALTER TABLE `User`
+ALTER TABLE `user`
     ADD CONSTRAINT user_username_un UNIQUE (nickname);
 
-ALTER TABLE `User`
+ALTER TABLE `user`
     ADD CONSTRAINT user_nickname_un UNIQUE (email);
 
-ALTER TABLE `User`
+ALTER TABLE `user`
     ADD CONSTRAINT user_username_nickname_un UNIQUE (email,
                                                      nickname);
 
-ALTER TABLE `User`
+ALTER TABLE `user`
     ADD CONSTRAINT user_user_id_unv1 UNIQUE (user_id);
 
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
@@ -150,11 +150,12 @@ ALTER TABLE user_location
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
 CREATE TABLE user_race_fk
 (
-    race_id INTEGER NOT NULL,
-    user_id INTEGER NOT NULL,
-    car_id  INTEGER NOT NULL,
-    step    INTEGER,
-    lap INTEGER
+    race_id   INTEGER NOT NULL,
+    user_id   INTEGER NOT NULL,
+    car_id    INTEGER NOT NULL,
+    step      INTEGER DEFAULT 1,
+    lap       INTEGER,
+    pass_time TIMESTAMP DEFAULT NOW()
 );
 
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
@@ -193,12 +194,12 @@ ALTER TABLE waypoint
 
 ALTER TABLE car
     ADD CONSTRAINT car_user_fk FOREIGN KEY (user_id)
-        REFERENCES `User` (user_id)
+        REFERENCES `user` (user_id)
         ON DELETE CASCADE;
 
 ALTER TABLE user_location
     ADD CONSTRAINT user_location_user_fk FOREIGN KEY (user_id)
-        REFERENCES `User` (user_id)
+        REFERENCES `user` (user_id)
         ON DELETE CASCADE;
 
 ALTER TABLE user_race_fk
@@ -213,7 +214,7 @@ ALTER TABLE user_race_fk
 
 ALTER TABLE user_race_fk
     ADD CONSTRAINT user_race_fk_user_fk FOREIGN KEY (user_id)
-        REFERENCES `User` (user_id)
+        REFERENCES `user` (user_id)
         ON DELETE CASCADE;
 
 ALTER TABLE waypoint

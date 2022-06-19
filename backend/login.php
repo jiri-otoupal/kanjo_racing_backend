@@ -15,7 +15,9 @@ $user = new User();
 $res = $user->login($_POST["email"], $_POST["password"]);
 
 $response = array();
-
+/**
+ * Check for valid response
+ */
 if ($res) {
     $response["message"] = "Logged in Successfully";
     $response["status"] = "OK";

@@ -13,7 +13,9 @@ $user = new User();
 $res = $user->auth($session_id);
 
 $response = array();
-
+/**
+ * Check for valid response
+ */
 if ($res) {
     $req_res = $user->getRaces();
     $response["message"] = "Authenticated Successfully";
