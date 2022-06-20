@@ -64,6 +64,10 @@ if ($res) {
             if ($car_id == null)
                 $response["hint"] = "Missing car"; //TODO alert user
             $response["message"] = "Failed " . $race->connection->error;
+            if (strpos(strtolower($response["message"]), "duplicate")) {
+                $response["status"] = "OK";
+                $response["message"] .= " join";
+            }
         }
 
     } else if (!isset($_POST["race_id"]) && !isset($_POST["waypoints"]) && !isset($_POST["delete"])) {

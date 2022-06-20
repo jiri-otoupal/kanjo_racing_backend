@@ -33,11 +33,20 @@ if ($res && isset($_POST["race_id"]) && isset($_POST["latitude"]) && isset($_POS
      */
     if ($dtw <= METERS_TO_WAYPOINT) {
         $race = new Race();
-        $race->nextWaypoint($user->getId(), $race_id);
+        $user_id = $user->getId();
+
+        $steps_max = $race->getRaceSteps($race_id);
+        $user_info = $race->getUserRaceInfo($user_id, $race_id);
+
+        if ($steps_max == $user_info["step"])
+            $race->nextLap($user_id, $race_id);
+        else
+            $race->nextWaypoint($user_id, $race_id);
+
         $response["collect"] = true;
-        //TODO: Increment lap
     }
 
+    $response["step"] = $next_waypoint["step"];
     $response["lat"] = $next_waypoint["latitude"];
     $response["lng"] = $next_waypoint["longitude"];
     $response["dtw"] = $dtw;

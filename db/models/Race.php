@@ -98,7 +98,71 @@ class Race extends DB
     {
         $escaped_id = $this->escape($user_id);
         $escaped_race_id = $this->escape($race_id);
+
+
         return $this->non_return_query("UPDATE user_race_fk SET step=IFNULL(step, 0) + 1 WHERE user_id='$escaped_id' AND race_id='$escaped_race_id'");
+    }
+
+    /**
+     * Increment laps
+     *
+     * if true lap incremented
+     * if false race is over
+     * @param $user_id
+     * @param $race_id
+     * @return bool
+     */
+    public function nextLap($user_id, $race_id)
+    {
+        $escaped_id = $this->escape($user_id);
+        $escaped_race_id = $this->escape($race_id);
+
+        $user_stats = $this->getUserRaceInfo($user_id, $race_id);
+        $race_info = $this->getRaceInfo($race_id);
+
+        /**
+         * Return false if try to increment last lap
+         */
+        if ($race_info["laps"] == $user_stats["lap"])
+            return false;
+
+
+        $this->non_return_query("UPDATE user_race_fk SET step=1 WHERE user_id='$escaped_id' AND race_id='$escaped_race_id'");
+        $this->non_return_query("UPDATE user_race_fk SET lap=IFNULL(lap, 0) + 1 WHERE user_id='$escaped_id' AND race_id='$escaped_race_id'");
+
+        return true;
+    }
+
+    /**
+     * @param $user_id
+     * @param $race_id
+     * @return array|false|null
+     */
+    public function getUserRaceInfo($user_id, $race_id)
+    {
+        $escaped_id = $this->escape($user_id);
+        $escaped_race_id = $this->escape($race_id);
+        return $this->query("SELECT step,lap from user_race_fk where user_id='$escaped_id' and race_id='$escaped_race_id'");
+    }
+
+    /**
+     * @param $race_id
+     * @return mixed
+     */
+    public function getRaceSteps($race_id)
+    {
+        $escaped_race_id = $this->escape($race_id);
+        return $this->query("SELECT MAX(step) AS steps from waypoint where race_id='$escaped_race_id'")["steps"];
+    }
+
+    /**
+     * @param $race_id
+     * @return array|false|null
+     */
+    public function getRaceInfo($race_id)
+    {
+        $escaped_race_id = $this->escape($race_id);
+        return $this->query("SELECT * from race where race_id='$escaped_race_id'");
     }
 
     /**

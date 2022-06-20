@@ -59,12 +59,14 @@ class User extends DB
     }
 
     /**
-     * @param $email
-     * @param $password
+     * @param $req
      * @return bool
      */
-    public function login($email, $password)
+    public function login($req)
     {
+        $email = $req["email"];
+        $password = $req["password"];
+
         $escaped_email = $this->escape($email);
 
         $res = $this->query("SELECT user_id,password FROM user WHERE email='$escaped_email'");
@@ -86,6 +88,22 @@ class User extends DB
     }
 
     /**
+     * @param $req
+     * @return bool
+     */
+    public function FBlogin($req)
+    {
+
+        $auth_token = $req["access_token"];
+
+        $_COOKIE["session_id"] = $auth_token;
+
+        $this->setSessionPWD($auth_token);
+        return true;
+
+    }
+
+    /**
      * @param $email
      * @param $nickname
      * @param $password
@@ -102,36 +120,10 @@ class User extends DB
         $res = $this->non_return_query("INSERT INTO user (email, nickname, password,session_pwd) VALUES
                                                    ('$escaped_email', '$escaped_nickname', '$hashed_pwd','$randomPassword')");
 
-        if ($res == false)
+        if (!$res)
             return false;
 
         return $this->getIdOfEmail($escaped_email);
-    }
-
-    /**
-     * @param $name
-     * @param $brand
-     * @param $hp
-     * @param $vehicle_type
-     * @param $img_url
-     * @return array
-     */
-    protected final function escapeCarParams($name, $brand, $hp, $vehicle_type, $img_url = null)
-    {
-        $escaped_name = $this->escape($name);
-        $escaped_brand = $this->escape($brand);
-        $escaped_hp = $this->escape($hp);
-        $escaped_vehicle_type = $this->escape($vehicle_type);
-        $escaped_img_url = $this->escape($img_url);
-
-        $escaped = array();
-        $escaped["name"] = $escaped_name;
-        $escaped["brand"] = $escaped_brand;
-        $escaped["hp"] = $escaped_hp;
-        $escaped["vehicle_type"] = $escaped_vehicle_type;
-        $escaped["img_url"] = $escaped_img_url;
-
-        return $escaped;
     }
 
     /**
@@ -209,10 +201,13 @@ class User extends DB
      */
     public function getNextWaypoint($race_id)
     {
+        $user_id = $this->id;
         $escaped_race_id = $this->escape($race_id);
+        $step = $this->query("SELECT step from user_race_fk where user_id='$user_id' and race_id='$escaped_race_id'")["step"] + 1;
+
 
         return $this->query("SELECT w.* FROM user_race_fk 
-            JOIN waypoint w on user_race_fk.step = w.step WHERE w.race_id='$escaped_race_id' AND user_id='$this->id'");
+            JOIN waypoint w on user_race_fk.race_id = w.race_id WHERE user_id='$user_id' AND w.step='$step'");
     }
 
     /**
@@ -222,7 +217,7 @@ class User extends DB
     public function getUserLocations($race_id)
     {
         $escaped_race_id = $this->escape($race_id);
-        return $this->query("SELECT user_location.*, u2.nickname,u.step
+        return $this->query("SELECT user_location.*, u2.nickname,u.step, u.lap
             FROM user_location
                      RIGHT JOIN user_race_fk u on user_location.user_id = u.user_id
                      JOIN user u2 on u.user_id = u2.user_id WHERE race_id='$escaped_race_id' 

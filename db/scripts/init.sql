@@ -153,8 +153,8 @@ CREATE TABLE user_race_fk
     race_id   INTEGER NOT NULL,
     user_id   INTEGER NOT NULL,
     car_id    INTEGER NOT NULL,
-    step      INTEGER DEFAULT 1,
-    lap       INTEGER,
+    step      INTEGER DEFAULT 0,
+    lap       INTEGER NOT NULL DEFAULT 1,
     pass_time TIMESTAMP DEFAULT NOW()
 );
 

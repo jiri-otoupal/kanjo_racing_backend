@@ -5,16 +5,21 @@ require_once realpath(dirname(__FILE__) . '/..') . "/db/models/User.php";
 prepareJsonAPI();
 
 
-
-if (!isset($_POST["email"]) || !isset($_POST["password"])) {
+if (!isset($_POST["email"])) {
     echo json_encode(fail());
     return;
 }
 
-$user = new User();
-$res = $user->login($_POST["email"], $_POST["password"]);
-
 $response = array();
+$user = new User();
+if (isset($_POST["access_token"])) {
+    $res = $user->FBlogin($_POST);
+    $response["auth_method"] = "FB";
+} else {
+    $res = $user->login($_POST);
+    $response["auth_method"] = "normal";
+}
+
 /**
  * Check for valid response
  */
