@@ -12,7 +12,7 @@ if (!isset($_POST["email"])) {
 
 $response = array();
 $user = new User();
-if (isset($_POST["access_token"])) {
+if (isset($_POST["access_token"]) && $_POST["access_token"] != "") {
     $res = $user->FBlogin($_POST);
     $response["auth_method"] = "FB";
 } else {

@@ -94,11 +94,31 @@ class User extends DB
     public function FBlogin($req)
     {
 
+        $escaped_email = $this->escape($req["email"]);
         $auth_token = $req["access_token"];
+        $nickname = $req["nickname"];
+
 
         $_COOKIE["session_id"] = $auth_token;
 
+        $query_string = "SELECT user_id,password from user where email='$escaped_email'";
+        $res = $this->query($query_string);
+        $hashed = hash("sha1", $auth_token);
+
+        if (empty($res)) {
+            $this->non_return_query("INSERT INTO user (email, nickname, password,session_pwd) VALUES
+                                                   ('$escaped_email','$nickname','no pwd','$hashed')");
+            $this->commit();
+        }
+
+        $res = $this->query($query_string);
+
+        if (empty($res))
+            return false;
+
+        $this->id = $res["user_id"];
         $this->setSessionPWD($auth_token);
+
         return true;
 
     }
@@ -269,7 +289,8 @@ class User extends DB
     {
         $this->sessionPWD = $sessionPwd;
         $ssid = hash("sha1", $sessionPwd);
-        return $this->non_return_query("UPDATE user SET session_pwd='$ssid' WHERE user_id='$this->id'");
+        $this->non_return_query("UPDATE user SET session_pwd='$ssid' WHERE user_id='$this->id'");
+        return $ssid;
     }
 
     /**
