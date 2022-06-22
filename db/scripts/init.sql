@@ -29,13 +29,12 @@ ALTER TABLE car
     ADD CONSTRAINT car_user_un UNIQUE (user_id,
                                        id);
 
-
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
 CREATE TABLE race
 (
     race_id       INTEGER      NOT NULL AUTO_INCREMENT,
     name          VARCHAR(100) NOT NULL,
-    start_time    DATETIME(6)  NOT NULL,
+    start_time    TIMESTAMP  NOT NULL,
     latitude      DOUBLE       NOT NULL,
     longitude     DOUBLE       NOT NULL,
     owner_id      INTEGER      NOT NULL,

@@ -149,7 +149,10 @@ class Race extends DB
     public function isRaceStarted($race_id)
     {
         $escaped_race_id = $this->escape($race_id);
-        return !empty($this->query("SELECT race_id from race where race_id='$escaped_race_id' and start_time<=NOW()"));
+        $time_zone = "-02:00"; //TODO: fix this to dynamicł
+
+
+        return !empty($this->query("SELECT * from race where race_id='$escaped_race_id' and timestampdiff(SECOND,CONVERT_TZ(start_time, @@system_time_zone,'$time_zone'),NOW())>=0;"));
     }
 
     /**

@@ -38,9 +38,8 @@ if ($res && isset($_POST["race_id"]) && isset($_POST["latitude"]) && isset($_POS
 
         $steps_max = $race->getRaceSteps($race_id);
         $user_info = $race->getUserRaceInfo($user_id, $race_id);
-        //$response["started"] = $race->isRaceStarted($race_id);
 
-        if ((int)$user_info["step"] == (int)$next_waypoint["step"] - 1) {
+        if ($race->isRaceStarted($race_id) && (int)$user_info["step"] == (int)$next_waypoint["step"] - 1) {
 
             if ($steps_max == $user_info["step"])
                 $race->nextLap($user_id, $race_id);
