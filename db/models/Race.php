@@ -145,6 +145,13 @@ class Race extends DB
         return $this->query("SELECT step,lap from user_race_fk where user_id='$escaped_id' and race_id='$escaped_race_id'");
     }
 
+
+    public function isRaceStarted($race_id)
+    {
+        $escaped_race_id = $this->escape($race_id);
+        return !empty($this->query("SELECT race_id from race where race_id='$escaped_race_id' and start_time<=NOW()"));
+    }
+
     /**
      * @param $race_id
      * @return mixed
@@ -171,7 +178,7 @@ class Race extends DB
      */
     public function getRace($id)
     {
-        if ($id == null)
+        if ($id == null || $id == "")
             return null;
 
         $escaped_id = $this->escape($id);

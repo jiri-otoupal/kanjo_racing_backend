@@ -31,19 +31,24 @@ if ($res && isset($_POST["race_id"]) && isset($_POST["latitude"]) && isset($_POS
     /**
      * Collect Waypoints on radius intersect
      */
+
     if ($dtw <= METERS_TO_WAYPOINT) {
         $race = new Race();
         $user_id = $user->getId();
 
         $steps_max = $race->getRaceSteps($race_id);
         $user_info = $race->getUserRaceInfo($user_id, $race_id);
+        //$response["started"] = $race->isRaceStarted($race_id);
 
-        if ($steps_max == $user_info["step"])
-            $race->nextLap($user_id, $race_id);
-        else
-            $race->nextWaypoint($user_id, $race_id);
+        if ((int)$user_info["step"] == (int)$next_waypoint["step"] - 1) {
 
-        $response["collect"] = true;
+            if ($steps_max == $user_info["step"])
+                $race->nextLap($user_id, $race_id);
+            else
+                $race->nextWaypoint($user_id, $race_id);
+
+            $response["collect"] = true;
+        }
     }
 
     $response["step"] = $next_waypoint["step"];
