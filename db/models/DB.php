@@ -7,7 +7,7 @@ if ($debug)
 else
     require (dirname(__FILE__) . '/..') . "/db_config_prod.php";
 
-abstract class DB
+class DB
 {
     // Protected so child's can access these attributes
     protected $dbPath = DB_DATABASE;
@@ -50,7 +50,7 @@ abstract class DB
     }
 
 
-    protected function query($query_string)
+    public function query($query_string)
     {
         $result = $this->connection->query($query_string);
 
@@ -61,7 +61,7 @@ abstract class DB
         return [];
     }
 
-    protected function non_return_query($query_string)
+    public function non_return_query($query_string)
     {
         try {
             return $this->connection->query($query_string);

@@ -123,6 +123,19 @@ class User extends DB
 
     }
 
+    /***
+     * @param $email
+     * @return bool
+     */
+    function validateEmail($email) {
+        if(filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     /**
      * @param $email
      * @param $nickname
@@ -131,6 +144,9 @@ class User extends DB
      */
     public function register($email, $nickname, $password)
     {
+        if($this->validateEmail($email))
+            return false;
+
         $escaped_email = $this->escape($email);
         $escaped_nickname = $this->escape($nickname);
 

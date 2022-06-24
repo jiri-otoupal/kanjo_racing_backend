@@ -47,7 +47,7 @@ if ($res) {
         $race = new Race($race_id);
         $operation = strtolower($operation);
 
-        if ($operation == "join" && isset($_POST["car_id"]) && ($car_id = $_POST["car_id"]) != null) {
+        if ($operation == "join" && isset($_POST["car_id"]) && ($car_id = $_POST["car_id"]) != null && !$race->isRaceStarted($race_id)) {
             $res = $race->join($user->getId(), $car_id, $race_id);
         } else if ($operation == "leave") {
             $res = $race->leave($user->getId(), $race_id);
