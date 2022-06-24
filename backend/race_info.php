@@ -10,13 +10,13 @@ require_once realpath(dirname(__FILE__) . '/..') . "/db/models/User.php";
 
 $db = new DB();
 $time_zone = "-02:00";
-$previous_races = $db->query("select race.name as rname,user_race_fk.pass_time, u.nickname, c.name, c.vehicle_type, c.brand
+$previous_races = $db->query("select race.start_time, race.name as rname,user_race_fk.pass_time, u.nickname, c.name, c.vehicle_type, c.brand
                                                 from race
                                                          JOIN user_race_fk on race.race_id = user_race_fk.race_id
                                                          JOIN user u on user_race_fk.user_id = u.user_id
                                                          JOIN car c on c.id = user_race_fk.car_id
                                                 where start_time <= NOW() ORDER BY race.race_id;");
-$future_races = $db->query("select race.name as rname,user_race_fk.pass_time, u.nickname, c.name, c.vehicle_type, c.brand
+$future_races = $db->query("select race.start_time,race.name as rname,user_race_fk.pass_time, u.nickname, c.name, c.vehicle_type, c.brand
                                                 from race
                                                          JOIN user_race_fk on race.race_id = user_race_fk.race_id
                                                          JOIN user u on user_race_fk.user_id = u.user_id
@@ -24,16 +24,18 @@ $future_races = $db->query("select race.name as rname,user_race_fk.pass_time, u.
                                                 where start_time >=NOW() ORDER BY race.race_id;");
 function output_info($races, $future = false)
 {
-
     $lname = "";
     foreach ($races as $race) {
         if ($lname != $race["rname"]) {
+            $t_str = "Happened at ";
+            if($future)
+                $t_str="Starts at ";
             $lname = $race["rname"];
-            echo "<h3>" . $race["rname"] . "</h3><br>";
+            echo "<h3>" . $race["rname"] . "</h3> <h5>" . $t_str . $race["start_time"] . "</h5><br>";
         }
-        $str = "Racer <b>" . $race["nickname"] . "</b> Car " . $race["name"] . " Vehicle Type " . $race["vehicle_type"] . " Brand " . $race["brand"];
+        $str = "Racer: <b>" . $race["nickname"] . "</b> | Car: " . $race["name"] . " | Vehicle Type: " . $race["vehicle_type"] . " | Brand: " . $race["brand"];
         if (!$future) {
-            $c_str = $str . " Elapsed Time " . $race["pass_time"] . "<br>";
+            $c_str = $str . " | Elapsed Time: " . $race["pass_time"] . "<br>";
             echo $c_str;
         } else {
             echo $str . "<br>";
